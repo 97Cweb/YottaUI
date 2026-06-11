@@ -1,0 +1,35 @@
+examples/**/secrets_local.h
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build output
+build/
+dist/
+out/
+.pio/
+cmake-build-*/
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.elf
+*.bin
+*.hex
+*.map
+
+# Temp/cache
+__pycache__/
+*.pyc
+*.orig
