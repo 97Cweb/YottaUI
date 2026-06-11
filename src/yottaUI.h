@@ -125,34 +125,69 @@ private:
   }
 
   void drawWrappedLine(String line,
-                       int16_t& lineIndex,
-                       int16_t& visibleLine,
-                       int16_t rows,
-                       int16_t cols,
-                       uint16_t fg,
-                       uint8_t textSize) {
-    int start = 0;
+                     int16_t& lineIndex,
+                     int16_t& visibleLine,
+                     int16_t rows,
+                     int16_t cols,
+                     uint16_t fg,
+                     uint8_t textSize) {
+  int start = 0;
+  int len = line.length();
 
-    while (start < line.length()) {
-      String chunk = line.substring(start, start + cols);
+  while (start < len) {
+    // Do not start a visual line with spaces
+    while (start < len && line[start] == ' ') {
+      start++;
+    }
 
-      if (lineIndex >= _scrollY && visibleLine < rows) {
-        _screen->text(_x + 2,
-                      _y + 2 + visibleLine * (8 * textSize),
-                      chunk.c_str(),
-                      fg,
-                      textSize);
-        visibleLine++;
+    if (start >= len) break;
+
+    int end = start + cols;
+
+    if (end >= len) {
+      end = len;
+    } else {
+      // Try to wrap at the last space within the allowed width
+      int wrapAt = -1;
+
+      for (int i = end; i > start; i--) {
+        if (line[i] == ' ') {
+          wrapAt = i;
+          break;
+        }
       }
 
-      lineIndex++;
-      start += cols;
+      if (wrapAt > start) {
+        end = wrapAt;
+      }
+      // else: no space found, so split the long word at cols
     }
 
-    if (line.length() == 0) {
-      lineIndex++;
+    String chunk = line.substring(start, end);
+
+    if (lineIndex >= _scrollY && visibleLine < rows) {
+      _screen->text(_x + 2,
+                    _y + 2 + visibleLine * (8 * textSize),
+                    chunk.c_str(),
+                    fg,
+                    textSize);
+      visibleLine++;
+    }
+
+    lineIndex++;
+
+    start = end;
+
+    // Skip the space that caused wrapping
+    while (start < len && line[start] == ' ') {
+      start++;
     }
   }
+
+  if (len == 0) {
+    lineIndex++;
+  }
+}
 
   YottaScreen* _screen;
   int16_t _x, _y, _w, _h;

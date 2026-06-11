@@ -47,10 +47,10 @@ void setup() {
 
   box.draw(ILI9341_BLACK, ILI9341_WHITE, ILI9341_CYAN,2);
 
-  box.setMode(YOTTA_TEXT_NO_WRAP);
-  box.setText("This line is intentionally very very very very very very long.");
-  box.scrollRight();
-  box.draw();
+  // box.setMode(YOTTA_TEXT_NO_WRAP);
+  // box.setText("This line is intentionally very very very very very very long.");
+  // box.scrollRight();
+  // box.draw();
 
 }
 
