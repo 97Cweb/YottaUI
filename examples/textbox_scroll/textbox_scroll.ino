@@ -20,7 +20,7 @@
 
 Adafruit_ILI9341 upper(UPPER_CS, UPPER_DC, UPPER_RST);
 YottaScreen upperScreen(&upper);
-YottaTextBox box(&upperScreen, 10, 40,300,180, YOTTA_TEXT_WRAP);
+TextBox box(&upperScreen, 10, 40,300,180, TEXT_WRAP);
 
 inline void selectUpper()   { digitalWrite(LOWER_CS, HIGH); digitalWrite(UPPER_CS, LOW); }
 
