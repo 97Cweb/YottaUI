@@ -27,7 +27,7 @@ grief.png
 
 [Part 1](https://yottarock.ca/blog/55) | [Part 2](https://yottarock.ca/blog/56) | [Part 3](https://yottarock.ca/blog/57) | [Part 4](https://yottarock.ca/blog/58) | [Part 5](https://yottarock.ca/blog/59) | [Part 6](https://yottarock.ca/blog/60) | [Part 7](https://yottarock.ca/blog/61) | [Part 8](https://yottarock.ca/blog/62)
 
-This is part 1 for a study on current society. Given that you found my little corner of the internet, you must have been wading for a while, and have heard of the terms of multiple coloured pills: Red pills, blue pills, and even black pills, and possibly more. I am here to argue that these pills and their main philosophy standpoint are all coping strategies of grief. Not on a personal level of grief, but on a civilizational level. 
+This is **part 1** for a study on current society. Given that you found my little corner of the internet, you must have been wading for a while, and have heard of the terms of multiple coloured pills: Red pills, blue pills, and even black pills, and possibly more. I am here to argue that these pills and their main philosophy standpoint are all coping strategies of grief. Not on a personal level of grief, but on a civilizational level. 
 )md";
 
 Adafruit_ILI9341 upper(UPPER_CS, UPPER_DC, UPPER_RST);
@@ -47,14 +47,14 @@ void setup() {
   upper.begin();
   // --- INIT UPPER ---
   selectUpper();
-  upper.setSPISpeed(4000000);
+  upper.setSPISpeed(2000000);
   upperScreen.setRotation(3);
 
   delay(1000);
 
 
   mdView.setDocument(&mdDoc);
-  mdView.scroll(200);
+  mdView.scroll(400);
   mdView.draw();
   
 

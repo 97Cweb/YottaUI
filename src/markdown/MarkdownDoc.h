@@ -46,4 +46,5 @@ private:
   std::vector<MdBlock> _blocks;
 
   void parse(const String& markdown);
+  void parseSpans(const String& text, MdBlock& block);
 };

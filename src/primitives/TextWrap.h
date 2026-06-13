@@ -4,10 +4,12 @@
 
 class TextWrap {
 public:
-  static String nextLine(const String& text, int& start, int16_t cols) {
+  static String nextLine(const String& text, int& start, int16_t cols, bool trimLeadingSpaces = true) {
     // Skip leading spaces so no line starts with a space
-    while (start < text.length() && text[start] == ' ') {
-      start++;
+    if (trimLeadingSpaces) {
+      while (start < text.length() && text[start] == ' ') {
+        start++;
+      }
     }
 
     if (start >= text.length()) {
@@ -44,7 +46,7 @@ public:
     }
 
     if (breakAt > start) {
-      String line = text.substring(start, breakAt);
+      String line = text.substring(start, breakAt + 1);
       start = breakAt + 1;
       return line;
     }

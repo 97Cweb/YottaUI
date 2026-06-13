@@ -19,6 +19,7 @@ enum DrawItemType {
 
 struct DrawItem {
   DrawItemType type;
+  SpanType spanType;
   int16_t x, y, w, h;
   String text;
   String target;
@@ -105,80 +106,93 @@ public:
 
 private:
   void buildLayout() {
-    _items.clear();
+  _items.clear();
 
-    if (!_doc) return;
+  if (!_doc) return;
+
+  const GFXfont* normalFont = &FreeMono9pt7b;
+  const GFXfont* boldFont   = &FreeMonoBold9pt7b;
+
+  const GFXfont* currentFont = normalFont;
+
+  int16_t lineY = _y + 2;
+
+  for (const MdBlock& block : _doc->getBlocks()) {
+    uint8_t itemTextSize = 1;
+
+    if (block.type == MD_HEADING) {
+      if (block.level == 1) itemTextSize = 3;
+      else if (block.level > 1) itemTextSize = 2;
+      else itemTextSize = 1;
+    }
 
     
 
-    int16_t lineY = _y + 2;
+    int16_t xCursor = _x + 2;
 
+    int16_t charH = _screen->textHeight("Mg", itemTextSize, normalFont);
+    int16_t lineH = charH + 4;
+    int16_t baseline = _screen->textBaselineOffset("Mg", itemTextSize, normalFont);
+    int16_t charW = _screen->textWidth("M", itemTextSize, currentFont);
+    int16_t colsLeft = (_x + _w - 4 - xCursor) / charW;
+    
+    
 
-    for (const MdBlock& block : _doc->getBlocks()) {
-
-
-      String blockText = "";
-
-      for (const MdSpan& span : block.spans) {
-        blockText += span.text;
+    for (const MdSpan& span : block.spans) {
+      if (span.type == SPAN_BOLD) {
+        currentFont = boldFont;
+      } else {
+        currentFont = normalFont;
       }
-
-
-      uint8_t itemTextSize = 1;
-
-      if (block.type == MD_HEADING) {
-        if (block.level == 1) itemTextSize = 3;
-        else if (block.level > 1) itemTextSize = 2;
-        else itemTextSize = 1;
-      }
-
-      //todo: process span parts, and get font type required for them.
-
-      int16_t charW = _screen->textWidth("M", itemTextSize, &FreeMono9pt7b);
-      int16_t charH = _screen->textHeight("Mg", itemTextSize, &FreeMono9pt7b);
-      int16_t baseline = _screen->textBaselineOffset("Mg", itemTextSize, &FreeMono9pt7b);
-
-      int16_t cols = (_w - 4) / charW;
 
       int start = 0;
 
-      while (start < blockText.length()) {
-        String line = TextWrap::nextLine(blockText, start, cols);       
+      while (start < span.text.length()) {
+        String remaining = span.text.substring(start);
 
-        
+        if (colsLeft <= 0) {
+          xCursor = _x + 2;
+          lineY += lineH;
+          colsLeft = (_w - 4) / charW;
+        }
+
+        int oldStart = start;
+        bool trimLeading = (xCursor == _x + 2);
+        String piece = TextWrap::nextLine(span.text, start, colsLeft,trimLeading);
+
+        if (piece.length() == 0 && start == oldStart) {
+          break;
+        }
 
         DrawItem item;
         item.type = DRAW_TEXT;
-        item.x = _x + 2;
+        item.spanType = span.type;
+        item.x = xCursor;
         item.y = lineY + baseline;
-        item.w = _w - 4;
-        item.h = charH;
-        item.text = line;
-        item.target = "";
+        item.w = piece.length() * charW;
+        item.h = lineH;
+        item.text = piece;
+        item.target = span.target;
         item.focusable = false;
         item.textSize = itemTextSize;
-        item.font = &FreeMono9pt7b;
+        item.font = currentFont;
 
         _items.push_back(item);
-        lineY += charH;
+
+        xCursor += item.w;
+
+        // If TextWrap consumed to a wrap boundary, move to next line
+        if (start < span.text.length()) {
+          xCursor = _x + 2;
+          lineY += lineH;
+        }
       }
-
-      DrawItem spacer;
-      spacer.type = DRAW_TEXT;
-      spacer.x = _x + 2;
-      spacer.y = lineY + baseline;
-      spacer.w = _w - 4;
-      spacer.h = charH;
-      spacer.text = "";
-      spacer.target = "";
-      spacer.focusable = false;
-      spacer.textSize = 1;
-      spacer.font = &FreeMono9pt7b;
-
-      _items.push_back(spacer);
-      lineY += charH;
     }
+
+    // block spacing
+    lineY += lineH;
   }
+}
 
   void drawItem(const DrawItem& item) {
     if (item.type == DRAW_TEXT) {
