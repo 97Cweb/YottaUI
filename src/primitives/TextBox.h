@@ -2,6 +2,7 @@
 #define YOTTA_TEXTBOX_H
 
 #include <Arduino.h>
+#include "TextWrap.h"
 
 class YottaScreen;
 
@@ -97,36 +98,19 @@ private:
                        int16_t cols,
                        uint16_t fg,
                        uint8_t textSize) {
+    if (line.length() == 0) {
+      lineIndex++;
+      return;
+    }
+
     int start = 0;
-    int len = line.length();
 
-    while (start < len) {
-      while (start < len && line[start] == ' ') {
-        start++;
+    while (start < line.length()) {
+      String chunk = TextWrap::nextLine(line, start, cols);
+
+      if (chunk.length() == 0 && start >= line.length()) {
+        break;
       }
-
-      if (start >= len) break;
-
-      int end = start + cols;
-
-      if (end >= len) {
-        end = len;
-      } else {
-        int wrapAt = -1;
-
-        for (int i = end; i > start; i--) {
-          if (line[i] == ' ') {
-            wrapAt = i;
-            break;
-          }
-        }
-
-        if (wrapAt > start) {
-          end = wrapAt;
-        }
-      }
-
-      String chunk = line.substring(start, end);
 
       if (lineIndex >= _scrollY && visibleLine < rows) {
         _screen->text(_x + 2,
@@ -137,15 +121,6 @@ private:
         visibleLine++;
       }
 
-      lineIndex++;
-      start = end;
-
-      while (start < len && line[start] == ' ') {
-        start++;
-      }
-    }
-
-    if (len == 0) {
       lineIndex++;
     }
   }

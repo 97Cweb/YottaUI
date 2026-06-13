@@ -47,22 +47,21 @@ void setup() {
   upper.begin();
   // --- INIT UPPER ---
   selectUpper();
-  upper.setSPISpeed(8000000);
+  upper.setSPISpeed(4000000);
   upperScreen.setRotation(3);
 
   delay(1000);
 
-  upperScreen.clear(ILI9341_BLACK);
-
-  
 
   mdView.setDocument(&mdDoc);
+  mdView.scroll(200);
   mdView.draw();
-  
   
 
 }
 
-void loop() {}
+void loop() {
+  
+}
 
 

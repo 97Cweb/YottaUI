@@ -29,6 +29,7 @@ struct MdBlock {
   MdBlockType type;
   std::vector<MdSpan> spans;
   String target;
+  uint8_t level = 0;
 };
 
 class MarkdownDoc{
